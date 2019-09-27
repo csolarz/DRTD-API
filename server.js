@@ -2,7 +2,7 @@
 switch (process.env.NODE_ENV) {
   case 'local':
     require('dotenv').config({
-      path: '.env.dev',
+      path: 'dev.env',
     });
     break;
   default:
