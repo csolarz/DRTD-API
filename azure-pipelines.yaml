@@ -1,0 +1,78 @@
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - master
+
+jobs:
+  - job: npm
+    pool:
+      name: Host linux local
+    steps:
+      - task: Npm@1
+        displayName: 'npm install'
+        inputs:
+          verbose: false
+
+      - task: Npm@1
+        displayName: 'Run unit and integration tests: testing api and bd connection'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: ' run integration-test'
+
+      - task: PublishTestResults@2
+        displayName: 'Publish tests results'
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: JUnit
+          testResultsFiles: '**/test-results.xml'
+
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Code coverage'
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/.test_output/coverage/cobertura-coverage.xml'
+          pathToSources: '$(System.DefaultWorkingDirectory)/.test_output/coverage'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/.test_output'
+
+  - job: docker
+    dependsOn: npm
+    pool:
+      name: Host linux local
+    steps:
+      - task: Docker@0
+        displayName: Build
+        inputs:
+          containerregistrytype: 'Container Registry'
+          dockerRegistryConnection: 'DRTD Registry'
+          action: 'Run a Docker command'
+          customCommand: 'build -t drtd-api:$(Build.BuildId) -f ./Dockerfile .'
+
+      - task: Docker@0
+        displayName: Tag
+        inputs:
+          containerregistrytype: 'Container Registry'
+          dockerRegistryConnection: 'DRTD Registry'
+          action: 'Run a Docker command'
+          customCommand: 'tag drtd-api:$(Build.BuildId) drtd.azurecr.io/drtd-api:$(Build.BuildId)'
+
+      - task: Docker@0
+        displayName: Push
+        inputs:
+          containerregistrytype: 'Container Registry'
+          dockerRegistryConnection: 'DRTD Registry'
+          action: 'Run a Docker command'
+          customCommand: 'push drtd.azurecr.io/drtd-api:$(Build.BuildId)'
+
+      - task: CopyFiles@2
+        displayName: 'Copy deployment & service files'
+        inputs:
+          SourceFolder: ci
+          Contents: '*.yaml'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact in drop folder'
