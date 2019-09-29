@@ -1,16 +1,16 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
   - master
 
 jobs:
   - job: npm
     pool:
-      name: Host linux local
+      name: Azure Pipelines
     steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 10.x'
+        inputs:
+          versionSpec: 10.x
+
       - task: Npm@1
         displayName: 'npm install'
         inputs:
@@ -41,36 +41,25 @@ jobs:
   - job: docker
     dependsOn: npm
     pool:
-      name: Host linux local
+      name: Azure Pipelines
     steps:
-      - task: Docker@0
-        displayName: Build
+      - task: Docker@2
+        displayName: login
         inputs:
-          containerregistrytype: 'Container Registry'
-          dockerRegistryConnection: 'DRTD Registry'
-          action: 'Run a Docker command'
-          customCommand: 'build -t drtd-api:$(Build.BuildId) -f ./Dockerfile .'
+          containerRegistry: 'malabareand dockerHub'
+          command: login
 
-      - task: Docker@0
-        displayName: Tag
+      - task: Docker@2
+        displayName: buildAndPush
         inputs:
-          containerregistrytype: 'Container Registry'
-          dockerRegistryConnection: 'DRTD Registry'
-          action: 'Run a Docker command'
-          customCommand: 'tag drtd-api:$(Build.BuildId) drtd.azurecr.io/drtd-api:$(Build.BuildId)'
-
-      - task: Docker@0
-        displayName: Push
-        inputs:
-          containerregistrytype: 'Container Registry'
-          dockerRegistryConnection: 'DRTD Registry'
-          action: 'Run a Docker command'
-          customCommand: 'push drtd.azurecr.io/drtd-api:$(Build.BuildId)'
+          containerRegistry: 'malabareand dockerHub'
+          repository: 'malabareand/drtd-api'
+          Dockerfile: Dockerfile
 
       - task: CopyFiles@2
         displayName: 'Copy deployment & service files'
         inputs:
-          SourceFolder: ci
+          SourceFolder: k8
           Contents: '*.yaml'
           TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
