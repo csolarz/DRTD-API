@@ -1,10 +1,10 @@
 trigger:
-  - master
+- master
 
 jobs:
   - job: npm
     pool:
-      name: Azure Pipelines
+      vmImage: 'ubuntu-latest'
     steps:
       - task: NodeTool@0
         displayName: 'Use Node 10.x'
@@ -41,7 +41,7 @@ jobs:
   - job: docker
     dependsOn: npm
     pool:
-      name: Azure Pipelines
+      vmImage: 'ubuntu-latest'
     steps:
       - task: Docker@2
         displayName: login
