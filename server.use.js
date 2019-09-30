@@ -8,6 +8,14 @@ const cors = corsMiddleware({
 });
 
 const init = (server, restify) => {
+  server.pre((req, res, next) => {
+    req.headers.accept = 'application/json';
+    res.charSet('utf-8');
+    res.header('Access-Control-Allow-Origin', '*');
+
+    return next();
+  });
+
   server.pre(cors.preflight);
   server.use(cors.actual);
 

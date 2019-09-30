@@ -25,19 +25,13 @@ const serverUse = require('./server.use');
 
 serverUse.set(server, restify);
 
-server.use(restify.plugins.bodyParser());
-
-server.pre((req, res, next) => {
-  req.headers.accept = 'application/json';
-  res.charSet('utf-8');
-  res.header('Access-Control-Allow-Origin', '*');
-
-  return next();
-});
-
 server.get('/api/status', (req, res) => {
   res.send(`service is running: ${process.env.VERSION_API} in ${process.env.NODE_ENV}!!`);
 });
+
+const routes = require('./src/routes/index');
+
+routes.applyRoutes(server);
 
 server.listen(process.env.PORT || 3101, () => {
   console.log('%s listening at %s', server.name, server.url);
