@@ -56,7 +56,8 @@
     "functions": 0,
     "branches": 0,
     "include": [
-      "routes/**/*.js"
+      "src/handlers/**/*.js",
+      "src/data/**/*.js"
     ],
     "reporter": [
       "cobertura",
