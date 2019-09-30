@@ -22,11 +22,10 @@ describe('PRODUCT API', () => {
         .expect(200)
         .end((err, res) => {
           if (err) {
-            console.clear();
             console.log('NOK /v1/products');
-            console.log(err);
             done(err);
           } else {
+            assert.isNotNull(res, 'response should return data');
             done();
           }
         });

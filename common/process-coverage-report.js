@@ -20,7 +20,7 @@ fs.readdir(CODE_COVERAGE_DIRECTORY, (err, files) => {
     throw new Error(err);
   }
 
-  const reports = files.filter((report) => report.endsWith('.html'));
+  const reports = files.filter(report => report.endsWith('.html'));
 
   const baseCss = fs.readFileSync(
     path.resolve(path.join(CODE_COVERAGE_DIRECTORY, 'base.css')),
