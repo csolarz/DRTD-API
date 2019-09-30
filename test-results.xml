@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.06" tests="1" failures="0">
+  <testsuite name="Root Suite" timestamp="2019-09-30T01:42:54" tests="0" failures="0" time="0">
+  </testsuite>
+  <testsuite name="PRODUCT API" timestamp="2019-09-30T01:42:54" tests="0" file="D:\code\DRTD-API\src\test\index.js" failures="0" time="0">
+  </testsuite>
+  <testsuite name="Should return data by GET" timestamp="2019-09-30T01:42:54" tests="1" file="D:\code\DRTD-API\src\test\index.js" failures="0" time="0.06">
+    <testcase name="PRODUCT API Should return data by GET OK /v1/products" time="0.06" classname="OK /v1/products">
+    </testcase>
+  </testsuite>
+</testsuites>
